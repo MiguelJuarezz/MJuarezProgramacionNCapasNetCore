@@ -1,0 +1,164 @@
+﻿@model ML.Usuario
+@{
+    ViewData["Title"] = "GetAll";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container">
+    <h2>Usuario</h2>
+    <p>Aqui puede ver, editar o agrgar a un usuario</p>
+    <p>Para agregar un usuario presione el boton verde</p>
+    <p>Para editar un usuario presione el boton amarillo</p>
+    <p>Para eliminar un usuario presione el boton rojo</p>
+
+    <div class="row">
+        <div style="float:right">
+            @Html.ActionLink("+", "Form", "Usuario", htmlAttributes: new { @class = "btn btn-success" })
+        </div>
+    </div>
+
+    @using (Html.BeginForm("GetAll", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="row">
+            <div class="col-md-3">
+                @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", @placeholder = "Nombre" })
+            </div>
+            <div class="col-md-3">
+                @Html.TextBoxFor(model => model.ApellidoPaterno, new { @class = "form-control", @placeholder = "Apellido Paterno" })
+            </div>
+            <div class="col-md-3">
+                @Html.DropDownListFor(model => model.Rol.IdRol, new SelectList(Model.Rol.Roles, "IdRol", "Nombre"), "Selecciona una opción", new { @class = "form-control" })
+            </div>
+            <div class="col-md-3">
+                <input type="submit" value="Buscar" class="btn btn-info" />
+            </div>
+        </div>
+
+    }
+
+    <hr />
+
+    <div class="row">
+
+        <table class="table  table-hover table-bordered table-responsive" id="tblUsuario">
+            <thead>
+                <tr>
+                    <th>Editar</th>
+                    <th style="display:none;">IdUsuario</th>
+                    <th>Nombre</th>
+                    <th>Fecha Nacimiento</th>
+                    <th>Sexo</th>
+                    <th>Telefono</th>
+                    <th>Email</th>
+                    <th>UserName</th>
+                    <th style="display: none;">Password</th>
+                    <th>Celular</th>
+                    <th>Curp</th>
+                    <th>Roles</th>
+                    <th>Status</th>
+                    <th>Direccion</th>
+                    <th>Imagen</th>
+                    <th>Eliminar</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (ML.Usuario usuario in Model.Usuarios)
+                {
+                    <tr>
+                        <td style="text-align: center; vertical-align: middle;"><a class="btn btn-warning" href="@Url.Action("Form", "Usuario", new { IdUsuario = usuario.IdUsuario })"><i class="bi bi-pencil-square" style="color: ivory"></i></a></td>
+                        <td style="display: none;">@usuario.IdUsuario</td>
+                        <td>@usuario.Nombre @usuario.ApellidoPaterno @usuario.ApellidoMaterno</td>
+                        @*<td></td>
+                            <td></td>*@
+                        <td>@usuario.FechaNacimiento</td>
+                        <td>@usuario.Sexo</td>
+                        <td>@usuario.Telefono</td>
+                        <td>@usuario.Email</td>
+                        <td>@usuario.UserName</td>
+                        <td style="display: none;">@usuario.Password</td>
+                        <td>@usuario.Celular</td>
+                        <td>@usuario.Curp</td>
+                        <td>@usuario.Rol.Nombre</td>
+                        @if (usuario.Status.Value)
+                        {
+                            <td style="text-align: center; vertical-align: middle;">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked onchange="ChangeStatus(@usuario.IdUsuario, this)">
+                                </div>
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="text-align: center; vertical-align: middle;">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" onchange="ChangeStatus(@usuario.IdUsuario, this);">
+                                </div>
+                            </td>
+                        }
+                        <td>
+                            @usuario.Direccion.Calle @usuario.Direccion.NumeroInterior @usuario.Direccion.NumeroExterior @usuario.Direccion.Colonia.Nombre
+                            @usuario.Direccion.Colonia.CosdigoPostal @usuario.Direccion.Colonia.Municipio.Nombre @usuario.Direccion.Colonia.Municipio.Estado.Nombre
+                            @usuario.Direccion.Colonia.Municipio.Estado.Pais.Nombre
+                        </td>
+                        @if (usuario.Imagen != null)
+                        {
+                            <td><img src="data:image/*;base64,@usuario.Imagen" style=" height:150px; width:100px;" /></td>
+
+                        }
+                        else
+                        {
+                            <td><img src="~/Imagen/SinUsuario.png" style=" height:150px; width:100px;" /></td>
+                        }
+                        <td style="text-align: center; vertical-align: middle;"><a class="btn btn-danger" href="@Url.Action("Delete", "Usuario", new { IdUsuario= usuario.IdUsuario})" onclick="return confirm('Estas seguro que deseas eliminar este registro?');"><i class="bi bi-eraser-fill" style="color: mintcream"></i></a></td>
+
+
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts
+{
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.1/js/dataTables.material.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#tblUsuario').DataTable({
+            searching: false,
+            "lengthMenu": [[5, 10, 15, 20, -1], [5, 10, 15, 20, "All"]],
+            autoWidth: false,
+            columnDefs: [
+                {
+                    targets: ['_all'],
+                    className: 'mdc-data-table__cell',
+                },
+            ],
+            language: {
+                url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
+            },
+
+         });
+    });
+
+    function ChangeStatus(IdUsuario,e){
+        var status = e.checked
+         $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CambiarStatus")',
+                dataType: 'json',
+                data: {IdUsuario, status},
+                success: {               },
+                error: function (ex) {
+                    alert('Failed.' + ex);
+                }
+            });
+    }
+</script>
+
+}

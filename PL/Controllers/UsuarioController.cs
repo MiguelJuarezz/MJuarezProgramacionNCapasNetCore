@@ -157,7 +157,7 @@ namespace PL.Controllers
 
 
             //valido si traigo imagen
-            if (image !=null)
+            if (image != null)
             {
                 //llamar al metodo que convierte a bytes la imagen
                 byte[] ImagenBytes = ConvertToBytes(image);
@@ -220,7 +220,7 @@ namespace PL.Controllers
 
             }
 
-            
+
         }
 
         [HttpGet]
@@ -278,6 +278,38 @@ namespace PL.Controllers
             ML.Result result = BL.Usuario.ChangeStatus(IdUsuario, status);
 
             return Json(result);
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(string username, string password)
+        {
+            ML.Result result = BL.Usuario.GetByUsername(username);
+            if (result.Correct)
+            {
+                ML.Usuario usuario = new ML.Usuario();
+                if (usuario.Password == password)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    ViewBag.Message = "El usuario y/o la contraseña son incorrectos";
+                    return PartialView("Modal");
+
+                }
+            }
+            else
+            {
+                ViewBag.Message = "El usuario y/o la contraseña son incorrectos";
+                return PartialView("Modal");
+            }
         }
     }
 }

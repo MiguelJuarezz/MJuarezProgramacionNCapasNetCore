@@ -15,6 +15,9 @@ namespace BL
                 using (DL.MjuarezProgramacionNcapasContext context = new DL.MjuarezProgramacionNcapasContext())
                 {
                     usuario.Rol.IdRol = (usuario.Rol.IdRol ==null) ? 0: usuario.Rol.IdRol;
+                    usuario.Nombre = (usuario.Nombre == null) ? "" : usuario.Nombre;
+                    usuario.ApellidoPaterno = (usuario.ApellidoPaterno == null) ? "" : usuario.ApellidoPaterno;
+
                     var usuarios = context.Usuarios.FromSqlRaw($"UsuarioGetAll '{usuario.Nombre}','{usuario.ApellidoPaterno}',{usuario.Rol.IdRol}").ToList();
                     result.Objects = new List<object>();
 
@@ -99,6 +102,90 @@ namespace BL
                 {
 
                     var objUsuario = context.Usuarios.FromSqlRaw($"UsuarioGetById {IdUsuario}").AsEnumerable().FirstOrDefault();
+
+                    result.Objects = new List<object>();
+
+                    if (objUsuario != null)
+                    {
+
+                        ML.Usuario usuario = new ML.Usuario();
+                        usuario.IdUsuario = objUsuario.IdUsuario;
+                        usuario.Nombre = objUsuario.Nombre;
+                        usuario.ApellidoPaterno = objUsuario.ApellidoPaterno;
+                        usuario.ApellidoMaterno = objUsuario.ApellidoMaterno;
+                        usuario.FechaNacimiento = objUsuario.FechaNacimiento.ToString("dd-MM-yyyy");
+                        usuario.Sexo = objUsuario.Sexo;
+                        usuario.Telefono = objUsuario.Telefono;
+                        usuario.Email = objUsuario.Email;
+                        usuario.UserName = objUsuario.UserName;
+                        usuario.Password = objUsuario.Password;
+                        usuario.Celular = objUsuario.Celular;
+                        usuario.Imagen = objUsuario.Imagen;
+                        usuario.Curp = objUsuario.Curp;
+
+
+                        usuario.Rol = new ML.Rol();
+                        usuario.Rol.IdRol = objUsuario.IdRol;
+
+                        usuario.Direccion = new ML.Direccion();
+                        usuario.Direccion.IdDireccion = objUsuario.IdDireccion;
+                        usuario.Direccion.Calle = objUsuario.Calle;
+                        usuario.Direccion.NumeroInterior = objUsuario.NumeroInterior;
+                        usuario.Direccion.NumeroExterior = objUsuario.NumeroExterior;
+
+                        usuario.Direccion.Colonia = new ML.Colonia();
+                        usuario.Direccion.Colonia.IdColonia = objUsuario.IdColonia;
+                        usuario.Direccion.Colonia.Nombre = objUsuario.ColoniaNombre;
+                        usuario.Direccion.Colonia.CosdigoPostal = objUsuario.CodigoPostal;
+                        usuario.Direccion.Colonia.CosdigoPostal = objUsuario.CodigoPostal;
+
+                        usuario.Direccion.Colonia.Municipio = new ML.Municipio();
+                        usuario.Direccion.Colonia.Municipio.IdMunicipio = objUsuario.IdMunicipio;
+                        usuario.Direccion.Colonia.Municipio.Nombre = objUsuario.MunicipioNombre;
+
+                        usuario.Direccion.Colonia.Municipio.Estado = new ML.Estado();
+                        usuario.Direccion.Colonia.Municipio.Estado.IdEstado = objUsuario.IdEstado;
+                        usuario.Direccion.Colonia.Municipio.Estado.Nombre = objUsuario.EstadoNombre;
+
+                        usuario.Direccion.Colonia.Municipio.Estado.Pais = new ML.Pais();
+                        usuario.Direccion.Colonia.Municipio.Estado.Pais.IdPais = objUsuario.IdPais;
+                        usuario.Direccion.Colonia.Municipio.Estado.Pais.Nombre = objUsuario.PaisNombre;
+
+                        usuario.Status = objUsuario.Status.Value;
+
+                        result.Object = usuario;
+
+
+                        result.Correct = true;
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                        result.ErrorMessage = "Ocurrió un error al obtener los registros en la tabla usuarios";
+                    }
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+
+            return result;
+        }
+        public static ML.Result GetByUsername(string username)
+        {
+            ML.Result result = new ML.Result();
+            try
+            {
+                using (DL.MjuarezProgramacionNcapasContext context = new DL.MjuarezProgramacionNcapasContext())
+                {
+
+                    var objUsuario = context.Usuarios.FromSqlRaw($"UsuarioGetByUsername {username}").FirstOrDefault();
 
                     result.Objects = new List<object>();
 

@@ -37,7 +37,7 @@ namespace PL.Controllers
                     client.BaseAddress = new Uri(urlAPI);
 
                     var responseTask = client.GetAsync("Usuario/GetAll");
-                    //result = BL.Usuario.GetAll(usuario);
+                    //result = BL.Usuario.GetAll(usuario); 
 
                     responseTask.Wait();
 
